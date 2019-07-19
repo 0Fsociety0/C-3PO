@@ -1,19 +1,35 @@
 import discord
-import json
-import time
-import aiohttp
-import asyncio
-from discord import Game
-from discord.ext.commands import Bot
+import random
+import requests
+from discord.ext import commands
 
+
+client = commands.Bot(command_prefix='./')
+
+
+#Handlers
+#get_bitcoin() is used in bitcoin bot command to gather data
+def get_bitcoin():
+    url = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json'
+    response = requests.get(url)
+    data = response.json()
+    return data
+
+
+#log() can be used in multiple commands and events when you need to log some shit.
+def log(log_message):
+    f = open('logfile.txt', 'a')
+    f.write(log_message)
+
+
+#read_token, obviously
 def read_token():
     with open("token.txt", "r") as f:
         lines = f.readlines()
-        return lines[0].strip()
+    return lines[0].strip()
 
-token = read_token()
-client = discord.Client()
 
+###Client Events###
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -22,43 +38,35 @@ async def on_ready():
     print('-----------------')
 
 @client.event
-async def wait_until_login():
-    await client.change_presence(game=discord.Game(name="Looking for   Master"))
-    print("C-3PO is booting up." + cient.user.name)
-
-
-@client.event
-async def on_message(message):
-    if message.content.find("!hello") != -1:
-        await message.channel.send("Hello, I am C-3PO, human cyborg relations.")
-
-@client.event
 async def on_member_join(member):
-    global joined
-    joined += 1
-    for channel in member.server.channels:
-        if str(channel) == "575157257126281238":
-                print ("Welcome {member.mention} to the Galactic Republic.")
+    role = discord.utils.get(member.guild.roles, name="TestRole")
+    await member.add_roles(role)
 
-@client.event
-async def on_member_join(member):
-    user = ctx.message.author
-    role = discord.utils.get(user.server.roles, name="Youngling")
-    await client.add_roles(user, role)
 
-@client.event
-async def on_member_remove(member):
-    print(member.name + ", has left the Republic.  The Force has weakened")
+###Client Commands###
+@client.command(pass_context=True, aliases = ['Bitcoin', 'BITCOIN'])
+async def bitcoin(ctx):
+    data = get_bitcoin()
+    channel = ctx.message.channel
+    await channel.send('Bitcoin price is currently: ' + data['bpi']['USD']['rate'])
 
-@client.event
-async def bitcoin():
-    url = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json'
-    async with aiohttp.clientSession() as session:
-        raw_response = await session.get(url)
-        repsonse = await raw_response.next()
-        repsonse = json.loads(response)
-        await client.say("Bitcoin price: $" + response['bpi']['USD']['rate'])
 
-#Bot Commands Section ---------------------------------
 
-client.run(token)
+@client.command(pass_context=True, aliases = ['Hello', 'HELLO'])
+async def hello(ctx):
+    channel = ctx.message.channel
+    display_name = ctx.author.display_name
+    greetings = [
+        " I am C3PO, Human Cyborg Relations",
+        " I dont know what all this trouble is about, but I'm sure it must be your fault",
+        " His  High Exhaltedness, the great Jabba the Hutt, has decreed that you are to be terminated immediately",
+        " I am fluent in over six million forms of communication",
+        " Its against my protocol to impersonate a deity",
+        " I suggest a new strategy, let the Wookie win."
+    ]
+    i = random.randrange(0, len(greetings))
+    await channel.send("Greetings, " + display_name + "." + greetings[i])
+
+
+token = read_token()
+client.run(token, reconnect=True)
