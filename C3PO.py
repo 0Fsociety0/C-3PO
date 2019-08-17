@@ -3,25 +3,22 @@ import random
 import requests
 from discord.ext import commands
 
-
 client = commands.Bot(command_prefix='./')
 
-
-#Handlers
-#get_bitcoin() is used in bitcoin bot command to gather data
+# Handlers
+# get_bitcoin() is used in bitcoin bot command to gather data
 def get_bitcoin():
     url = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json'
     response = requests.get(url)
     data = response.json()
     return data
 
-
-#log() can be used in multiple commands and events when you need to log some shit.
+# log() can be used in multiple commands and events when you need to log some shit.
 def log(log_message):
-    f = open('logfile.txt', 'a')
-    f.write(log_message)
+    with open('logfile.txt', 'a') as f:
+        f.write(log_message)
 
-#logic to find if a proposed movie already exists in the watch list
+# logic to find if a proposed movie already exists in the watch list
 def movie_exists(arg):
     videos = []
     movie = arg.lower()
@@ -34,12 +31,10 @@ def movie_exists(arg):
             return True
     return False
 
-
 def movies():
     with open("watch_list", 'r') as movie_file:
         head = [next(movie_file) for x in range(10)]
     return head
-
 
 def rolling_dice(arg0, arg1):
     i = 0
@@ -57,13 +52,11 @@ def rolling_dice(arg0, arg1):
     average = sum(rolls) / len(rolls)
     return ("Dice Rolls: " + str(rolls) + "\n" + "Analytics: \n" + "Sum: " + str(addition) + "\n" + "Average: " + str(average))
 
-
 #read_token, obviously
 def read_token():
     with open("token.txt", "r") as f:
         lines = f.readlines()
     return lines[0].strip()
-
 
 ###Client Events###
 @client.event
@@ -73,23 +66,19 @@ async def on_ready():
     print(client.user.id)
     print('-----------------')
 
-
 @client.event
 async def on_member_join(member):
     role = discord.utils.get(member.guild.roles, name="Youngling")
     await member.add_roles(role)
 
-
-
 ###Client Commands###
-@client.command(pass_context=True, aliases = ['Bitcoin', 'BITCOIN'])
+@client.command(pass_context=True, aliases=['Bitcoin', 'BITCOIN'])
 async def bitcoin(ctx):
     data = get_bitcoin()
     channel = ctx.message.channel
     await channel.send('Bitcoin price is currently: ' + data['bpi']['USD']['rate'])
 
-
-@client.command(pass_context=True, aliases = ['Hello', 'HELLO'])
+@client.command(pass_context=True, aliases=['Hello', 'HELLO'])
 async def hello(ctx):
     channel = ctx.message.channel
     display_name = ctx.author.display_name
@@ -104,21 +93,15 @@ async def hello(ctx):
     i = random.randrange(0, len(greetings))
     await channel.send("Greetings, " + display_name + "." + greetings[i])
 
-
-@client.command(pass_context=True, aliases =["Dice_roll","Dice_Roll", "DICE_ROLL"])
+@client.command(pass_context=True, aliases=["Dice_roll", "Dice_Roll", "DICE_ROLL"])
 async def dice_roll(ctx, arg0, arg1):
     author = ctx.message.author.display_name
     channel = ctx.message.channel
     message = rolling_dice(arg0, arg1)
     await channel.send(message)
 
-
-
-    #Make it better, handle more dice. Its going to be for DnD
-
-
-
-@client.command(pass_context=True, aliases = [])
+# Make it better, handle more dice. Its going to be for DnD
+@client.command(pass_context=True, aliases=[])
 async def suggestions(ctx, arg):
     author = ctx.message.author.display_name
     channel = ctx.message.channel
@@ -129,16 +112,12 @@ async def suggestions(ctx, arg):
     else:
         await channel.send(author + ", the movie already existed in the list")
 
-
 @client.command(pass_context=True, aliases=[])
 @commands.has_role('TestRole')
 async def movie_list(ctx):
     author = ctx.message.author.display_name
     channel = ctx.message.channel
     await channel.send("Not Implemented")
-
-
-
 
 token = read_token()
 client.run(token, reconnect=True)
