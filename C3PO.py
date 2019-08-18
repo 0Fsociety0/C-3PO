@@ -3,28 +3,28 @@ import random
 import requests
 from discord.ext import commands
 
-client = commands.Bot(command_prefix='./')
+client = commands.Bot(command_prefix="./")
 
 # Handlers
 # get_bitcoin() is used in bitcoin bot command to gather data
 def get_bitcoin():
-    url = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json'
+    url = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
     response = requests.get(url)
     data = response.json()
     return data
 
 # log() can be used in multiple commands and events when you need to log some shit.
 def log(log_message):
-    with open('logfile.txt', 'a') as f:
+    with open("logfile.txt", "a") as f:
         f.write(log_message)
 
 # logic to find if a proposed movie already exists in the watch list
 def movie_exists(arg):
     videos = []
     movie = arg.lower()
-    f = open("watch_list", 'r').readlines()
+    f = open("watch_list", "r").readlines()
     for a in f:
-        vids = a.strip().split(',')
+        vids = a.strip().split(",")
         videos.append(vids[1])
     for film in videos:
         if movie == film.lower():
@@ -32,7 +32,7 @@ def movie_exists(arg):
     return False
 
 def movies():
-    with open("watch_list", 'r') as movie_file:
+    with open("watch_list", "r") as movie_file:
         head = [next(movie_file) for x in range(10)]
     return head
 
@@ -50,7 +50,7 @@ def rolling_dice(arg0, arg1):
             i = i + 1
     addition = sum(rolls)
     average = sum(rolls) / len(rolls)
-    return ("Dice Rolls: " + str(rolls) + "\n" + "Analytics: \n" + "Sum: " + str(addition) + "\n" + "Average: " + str(average))
+    return (f"Dice Rolls: {str(rolls)}\nAnalytics: \nSum: {str(addition)}\nAverage: {str(average)}")
 
 #read_token, obviously
 def read_token():
@@ -61,10 +61,10 @@ def read_token():
 ###Client Events###
 @client.event
 async def on_ready():
-    print('Logged in as')
+    print("Logged in as")
     print(client.user.name)
     print(client.user.id)
-    print('-----------------')
+    print("-----------------")
 
 @client.event
 async def on_member_join(member):
@@ -72,13 +72,13 @@ async def on_member_join(member):
     await member.add_roles(role)
 
 ###Client Commands###
-@client.command(pass_context=True, aliases=['Bitcoin', 'BITCOIN'])
+@client.command(pass_context=True, aliases=["Bitcoin", "BITCOIN"])
 async def bitcoin(ctx):
     data = get_bitcoin()
     channel = ctx.message.channel
-    await channel.send('Bitcoin price is currently: ' + data['bpi']['USD']['rate'])
+    await channel.send(f"Bitcoin price is currently: {data["bpi"]["USD"]["rate"]}")
 
-@client.command(pass_context=True, aliases=['Hello', 'HELLO'])
+@client.command(pass_context=True, aliases=["Hello", "HELLO"])
 async def hello(ctx):
     channel = ctx.message.channel
     display_name = ctx.author.display_name
@@ -91,7 +91,7 @@ async def hello(ctx):
         " I suggest a new strategy, let the Wookie win."
     ]
     i = random.randrange(0, len(greetings))
-    await channel.send("Greetings, " + display_name + "." + greetings[i])
+    await channel.send(f"Greetings, {display_name}. {greetings[i]}")
 
 @client.command(pass_context=True, aliases=["Dice_roll", "Dice_Roll", "DICE_ROLL"])
 async def dice_roll(ctx, arg0, arg1):
@@ -106,14 +106,14 @@ async def suggestions(ctx, arg):
     author = ctx.message.author.display_name
     channel = ctx.message.channel
     if not movie_exists(arg):
-        with open("watch_list", 'a') as f:
-            f.write(author + "," + arg + "\n")
-        await channel.send(author + ", " + str(channel) + ", " + arg + " has been added to the list")
+        with open("watch_list", "a") as f:
+            f.write(f"{author}, {arg}\n")
+        await channel.send(f"{author}, {str(channel)}, {arg} has been added to the list")
     else:
-        await channel.send(author + ", the movie already existed in the list")
+        await channel.send(f"{author}, the movie already existed in the list")
 
 @client.command(pass_context=True, aliases=[])
-@commands.has_role('TestRole')
+@commands.has_role("TestRole")
 async def movie_list(ctx):
     author = ctx.message.author.display_name
     channel = ctx.message.channel
