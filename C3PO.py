@@ -50,7 +50,10 @@ def rolling_dice(arg0, arg1):
             i = i + 1
     addition = sum(rolls)
     average = sum(rolls) / len(rolls)
-    return (f"Dice Rolls: {str(rolls)}\nAnalytics: \nSum: {str(addition)}\nAverage: {str(average)}")
+    return (f"Dice Rolls: {str(rolls)}\n"
+            f"Analytics:\n"
+            f"Sum: {str(addition)}\n"
+            f"Average: {str(average)}")
 
 #read_token, obviously
 def read_token():
