@@ -24,7 +24,7 @@ aykaym 7/26/2019:
 -Think of ways to expand on automatic reminders on certain movies that are about to be shown
 
 
-Eurphuct
+Eurphuct 9/4/2019
 Assigning role "Youngling" upon joining the server has been fixed.
 
 To-do-list
