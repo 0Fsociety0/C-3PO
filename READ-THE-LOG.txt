@@ -22,3 +22,11 @@ aykaym 7/26/2019:
 -Need to implement way for list to be read based on permissions
 -Need to implement permissions based deletion of entries in list
 -Think of ways to expand on automatic reminders on certain movies that are about to be shown
+
+
+Eurphuct
+Assigning role "Youngling" upon joining the server has been fixed.
+
+To-do-list
+-Update all data so that the bot is in the re-written form of python.
+-Implement a form to communitcate with R2-D2 so that all commands just go through C-3PO
